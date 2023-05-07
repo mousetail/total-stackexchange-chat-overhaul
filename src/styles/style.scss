@@ -1,0 +1,60 @@
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.messages-container {
+    display: grid;
+    grid-template-columns: 8rem 1fr;
+    gap: 0.2rem;
+    overflow-y: scroll;
+    height: calc(100vh - 10rem);
+}
+
+.message {
+    display: contents;
+}
+
+.message-author {
+    grid-column: 1;
+    text-align: right;
+    padding: 0.25rem;
+}
+
+.message-content {
+    grid-column: 2;
+    padding: 0.25rem;
+    background-color: #eef;
+    white-space: pre-wrap;
+}
+
+body {
+    color: #222;
+    font-family: sans-serif;
+}
+
+textarea {
+    resize: none;
+    height: 100%;
+    width: calc(100vw - 9rem);
+}
+
+button {
+    border: none;
+    color: #ddd;
+    padding: 0.5rem;
+    color: black;
+    min-width: 8rem;
+}
+
+.message-composer {
+    display: flex;
+    align-items: center;
+}
+
+form {
+    display: contents;
+}

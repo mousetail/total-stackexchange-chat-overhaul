@@ -1,0 +1,20 @@
+{
+  "name": "total_chat_replacement_set",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mousetail",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "parcel": "^2.8.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@parcel/transformer-sass": "^2.8.3",
+    "@types/react": "^18.2.5",
+    "process": "^0.11.10"
+  }
+}
