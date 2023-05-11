@@ -5,7 +5,14 @@ import MessageComposer from './MessageComposer';
 import { ChatEvent, EventType, NewMessageEvent } from './types';
 import { chatRoomId, groupMessages, MessageGroup, sanitizeMessage } from './util';
 
+let socketOpenedBefore = false;
+
 const createSocket = async (fkey: string, setSocket: (ws: WebSocket) => void, setMessages: (cb: (g: MessageGroup[]) => MessageGroup[]) => void): Promise<WebSocket> => {
+    if (socketOpenedBefore) {
+        throw new Error("Socket opened before");
+    }
+    socketOpenedBefore = true;
+
     const auth = await fetch("https://chat.stackexchange.com/ws-auth", {
         'method': 'POST',
         'body': `roomid=${chatRoomId}&fkey=${fkey}`,
@@ -93,7 +100,7 @@ const App = () => {
 
         fetch(`https://chat.stackexchange.com/chats/${chatRoomId}/events`, {
             'method': 'POST',
-            'body': 'since=0&mode=Messages&msgCount=100&fkey=' + fkey,
+            'body': 'since=0&mode=Messages&msgCount=100&fkey=' + fkey.fkey,
             'headers': {
                 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
             }
@@ -119,7 +126,7 @@ const App = () => {
         () => {
             if (!fkey) return;
 
-            const socketPromise = createSocket(fkey, setSocket, setMessages);
+            const socketPromise = createSocket(fkey.fkey, setSocket, setMessages);
 
             return () => void (socketPromise.then(socket => socket.close()));
         },
@@ -133,12 +140,14 @@ const App = () => {
         [messages]
     )
 
+    console.log("userId=", fkey?.userId);
+
     return <div>
         <div className="messages-container">
             {
                 messages.map(
                     (message: MessageGroup) => (
-                        <div className='message' key={message.messages[0].message_id}>
+                        <div className={'message' + (message.author.id === fkey?.userId ? ' mine' : '') + (message.author.id === 0 ? ' system-message' : '')} key={message.messages[0].message_id}>
                             <div className='message-author'>{message.author.name}</div>
                             <div className='message-content'>
                                 {

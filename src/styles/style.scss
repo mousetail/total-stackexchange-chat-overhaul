@@ -9,26 +9,44 @@
 .messages-container {
     display: grid;
     grid-template-columns: 8rem 1fr;
-    gap: 0.2rem;
+    gap: 0.6rem 0.2rem;
     overflow-y: scroll;
     height: calc(100vh - 10rem);
 }
 
 .message {
     display: contents;
-}
 
-.message-author {
-    grid-column: 1;
-    text-align: right;
-    padding: 0.25rem;
-}
+    .message-author {
+        grid-column: 1;
+        text-align: right;
+        padding: 0.25rem;
+    }
 
-.message-content {
-    grid-column: 2;
-    padding: 0.25rem;
-    background-color: #eef;
-    white-space: pre-wrap;
+    .message-content {
+        grid-column: 2;
+        padding: 0.5rem;
+        background-color: #eef;
+        white-space: pre-wrap;
+    }
+
+    &.mine .message-content {
+        background-color: #ffe;
+    }
+
+    &.system-message {
+        font-size: small;
+        font-style: italic;
+
+        .message-author {
+            padding: 0;
+        }
+
+        .message-content {
+            background-color: transparent;
+            padding: 0;
+        }
+    }
 }
 
 body {
@@ -40,6 +58,11 @@ textarea {
     resize: none;
     height: 100%;
     width: calc(100vw - 9rem);
+}
+
+textarea:active,
+textarea:focus-visible {
+    outline: none;
 }
 
 button {

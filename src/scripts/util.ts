@@ -2,15 +2,6 @@ import { NewMessageEvent } from "./types";
 
 export const chatRoomId = 1;
 
-export const getFkey = async ()=> {
-    const response = await fetch(`https://chat.stackexchange.com/rooms/${chatRoomId}/sandbox`);
-    const parser = new DOMParser();
-    const dom = parser.parseFromString(await response.text(), 'text/html');
-    const fkey = (dom.querySelector('input[name="fkey"]') as HTMLInputElement).value;
-
-    return fkey;
-}
-
 export interface MessageGroup {
     author: {
         name: string,
@@ -38,7 +29,7 @@ export const groupMessages = (messages: NewMessageEvent[]): MessageGroup[] => {
     const new_messages = [
         {
             author: {
-                name: messages[0].user_name, 
+                name: messages[0].user_name,
                 id: messages[0].user_id
             },
             messages: [sanitizeMessage(messages[0])]

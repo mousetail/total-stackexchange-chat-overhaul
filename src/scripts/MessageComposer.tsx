@@ -20,7 +20,7 @@ const MessageComposer = () => {
 
             fetch(`https://chat.stackexchange.com/chats/${chatRoomId}/messages/new`, {
                 method: 'POST',
-                body: `text=${encodeURIComponent(message)}&fkey=${fkey}`,
+                body: `text=${encodeURIComponent(message)}&fkey=${fkey?.fkey}`,
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }
