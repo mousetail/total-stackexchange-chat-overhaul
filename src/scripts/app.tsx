@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useRef } from 'react';
 import { useFkey } from './fkeyprovider';
+import Message from './message';
 import MessageComposer from './MessageComposer';
+import Starboard from './starboard';
 import { ChatEvent, EventType, NewMessageEvent } from './types';
 import { chatRoomId, groupMessages, MessageGroup, sanitizeMessage } from './util';
 
@@ -143,24 +145,18 @@ const App = () => {
     console.log("userId=", fkey?.userId);
 
     return <div>
-        <div className="messages-container">
-            {
-                messages.map(
-                    (message: MessageGroup) => (
-                        <div className={'message' + (message.author.id === fkey?.userId ? ' mine' : '') + (message.author.id === 0 ? ' system-message' : '')} key={message.messages[0].message_id}>
-                            <div className='message-author'>{message.author.name}</div>
-                            <div className='message-content'>
-                                {
-                                    message.messages.map(submessage =>
-                                        (<div key={submessage.message_id}>{submessage.content}</div>)
-                                    )
-                                }
-                            </div>
-                        </div>
+        <div className='two-column'>
+            <div className="messages-container">
+                {
+                    messages.map(
+                        (group: MessageGroup) => (
+                            <Message group={group} key={group.messages[0].message_id} />
+                        )
                     )
-                )
-            }
-            <div ref={containerRef} />
+                }
+                <div ref={containerRef} />
+            </div>
+            <Starboard />
         </div>
 
         <MessageComposer />

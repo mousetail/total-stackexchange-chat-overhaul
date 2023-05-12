@@ -9,7 +9,7 @@
 .messages-container {
     display: grid;
     grid-template-columns: 8rem 1fr;
-    gap: 0.6rem 0.2rem;
+    gap: 0.8rem 0.2rem;
     overflow-y: scroll;
     height: calc(100vh - 10rem);
 }
@@ -21,6 +21,10 @@
         grid-column: 1;
         text-align: right;
         padding: 0.25rem;
+
+        .author-time {
+            color: grey;
+        }
     }
 
     .message-content {
@@ -28,6 +32,7 @@
         padding: 0.5rem;
         background-color: #eef;
         white-space: pre-wrap;
+        box-shadow: #0002 1px 1px 4px 2px;
     }
 
     &.mine .message-content {
@@ -40,9 +45,14 @@
 
         .message-author {
             padding: 0;
+
+            .author-time {
+                display: none;
+            }
         }
 
         .message-content {
+            box-shadow: none;
             background-color: transparent;
             padding: 0;
         }
@@ -58,11 +68,21 @@ textarea {
     resize: none;
     height: 100%;
     width: calc(100vw - 9rem);
+
+    box-shadow: #0002 1px 1px 4px 2px;
+    border: none;
+    margin: 0.5rem;
+    padding: 0.5rem;
+
+    &:active,
+    &:focus-visible {
+        outline: none;
+        box-shadow: #0882 1px 1px 4px 2px;
+    }
 }
 
-textarea:active,
-textarea:focus-visible {
-    outline: none;
+.two-column {
+    display: flex;
 }
 
 button {
@@ -80,4 +100,15 @@ button {
 
 form {
     display: contents;
+}
+
+.starboard {
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .star-author {
+        color: grey;
+    }
 }
