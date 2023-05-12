@@ -81,8 +81,27 @@ textarea {
     }
 }
 
-.two-column {
+.main-window {
     display: flex;
+
+    .starboard {
+        width: 20rem;
+    }
+
+    .chat-column {
+        width: calc(100vw - 35rem);
+    }
+
+    .channels {
+        width: 15rem;
+
+        button,
+        input {
+            width: 100%;
+            margin: 0.5rem 0;
+            height: 2rem;
+        }
+    }
 }
 
 button {

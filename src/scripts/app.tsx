@@ -1,165 +1,68 @@
-import React, { useState, useEffect } from 'react';
-import { useRef } from 'react';
-import { useFkey } from './fkeyprovider';
-import Message from './message';
-import MessageComposer from './MessageComposer';
+import React, { useState } from 'react';
+import ChatWindow from './chatWindow';
 import Starboard from './starboard';
-import { ChatEvent, EventType, NewMessageEvent } from './types';
-import { chatRoomId, groupMessages, MessageGroup, sanitizeMessage } from './util';
 
-let socketOpenedBefore = false;
-
-const createSocket = async (fkey: string, setSocket: (ws: WebSocket) => void, setMessages: (cb: (g: MessageGroup[]) => MessageGroup[]) => void): Promise<WebSocket> => {
-    if (socketOpenedBefore) {
-        throw new Error("Socket opened before");
-    }
-    socketOpenedBefore = true;
-
-    const auth = await fetch("https://chat.stackexchange.com/ws-auth", {
-        'method': 'POST',
-        'body': `roomid=${chatRoomId}&fkey=${fkey}`,
-        'headers': {
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-        }
-    });
-    const { url } = await auth.json();
-
-    const socket = new WebSocket(url + "?l=" + (+ new Date()));
-
-    socket.addEventListener(
-        'open', () => {
-            setSocket(socket);
-
-            setMessages(messages => [...messages, {
-                author: {
-                    id: 0,
-                    name: 'system'
-                },
-                messages: [
-                    {
-                        message_id: 0,
-                        room_id: 0,
-                        user_id: 0,
-                        user_name: 'system',
-                        content: 'Connected',
-                        event_type: 1,
-                        time_stamp: 0
-                    }
-                ]
-            }])
-        }
-    )
-
-    socket.addEventListener('message', (ev: MessageEvent) => {
-        const data = JSON.parse(ev.data);
-        if (!data?.r1?.e) {
-            return;
-        }
-
-        data.r1.e.map(
-            (chatEvent: ChatEvent) => {
-                if (chatEvent.event_type === EventType.Message && chatEvent.content) {
-                    setMessages((oldMessages) => {
-                        if (oldMessages[oldMessages.length - 1].author.id === chatEvent.user_id) {
-                            return [...oldMessages.slice(0, oldMessages.length - 1),
-                            {
-                                ...oldMessages[oldMessages.length - 1],
-                                messages: [
-                                    ...oldMessages[oldMessages.length - 1].messages,
-                                    chatEvent
-                                ]
-                            }
-                            ]
-                        } else {
-                            return [...oldMessages, {
-                                author: {
-                                    id: chatEvent.user_id,
-                                    name: chatEvent.user_name
-                                },
-                                messages: [
-                                    sanitizeMessage(chatEvent)
-                                ]
-                            }]
-                        }
-                    })
-                }
-            }
-        )
-    });
-
-
-    return socket;
+type RoomInfo = {
+    name: string,
+    id: number
 }
 
+const defaultRooms = [
+    {
+        id: 1,
+        name: "Sandbox"
+    }
+]
+
 const App = () => {
-    const [messages, setMessages] = useState<MessageGroup[]>([]);
-    const fkey = useFkey();
-    const [socket, setSocket] = useState<WebSocket | undefined>();
-    const containerRef = useRef<HTMLDivElement | null>(null);
+    const [currentRoom, setCurrentRoom] = useState(240);
+    const [favoriteRooms, setFavoriteRooms] = useState<RoomInfo[]>(() => JSON.parse(localStorage.getItem("chat-favorite-rooms") ?? JSON.stringify(defaultRooms)));
+    const [editingRoomNumber, setEditingRoomNumber] = useState('');
+    const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        if (!fkey) return;
-
-        fetch(`https://chat.stackexchange.com/chats/${chatRoomId}/events`, {
-            'method': 'POST',
-            'body': 'since=0&mode=Messages&msgCount=100&fkey=' + fkey.fkey,
-            'headers': {
-                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-            }
+    const addFavoriteRoom = async (ev) => {
+        if (Number.isNaN(+editingRoomNumber)) {
+            return;
         }
-        ).then(
-            (res) => {
-                if (!res.ok) {
-                    return res.text().then((e) => Promise.reject(e))
-                } else {
-                    return res.json() as Promise<{ events: ChatEvent[] }>
-                }
+        const response = await fetch(`https://chat.stackexchange.com/rooms/${+editingRoomNumber}/sandbox`);
+        if (!response.ok) {
+            console.error("Failed");
+            setError(response.statusText);
+        }
+        const text = await response.text();
+        const parser = new DOMParser();
+        const newDocument = parser.parseFromString(text, 'text/html');
+        const title = newDocument.title.split(" | chat")[0];
+
+        setFavoriteRooms(
+            (previousFavoriteRooms) => {
+                const newRooms = [
+                    ...previousFavoriteRooms,
+                    {
+                        id: +editingRoomNumber,
+                        name: title
+                    }
+                ];
+                localStorage.setItem('chat-favorite-rooms', JSON.stringify(newRooms));
+                return newRooms;
             }
-        ).then(
-            (res) => setMessages(groupMessages(res.events.filter(
-                (event: ChatEvent) => event.event_type === EventType.Message && event.content
-            )))
-        ).catch(
-            console.error
         )
-    }, [fkey]);
+    }
 
-    useEffect(
-        () => {
-            if (!fkey) return;
-
-            const socketPromise = createSocket(fkey.fkey, setSocket, setMessages);
-
-            return () => void (socketPromise.then(socket => socket.close()));
-        },
-        [fkey]
-    );
-
-    useEffect(
-        () => {
-            containerRef.current?.scrollIntoView({ behavior: 'smooth' })
-        },
-        [messages]
-    )
-
-    console.log("userId=", fkey?.userId);
-
-    return <div>
-        <div className='two-column'>
-            <div className="messages-container">
-                {
-                    messages.map(
-                        (group: MessageGroup) => (
-                            <Message group={group} key={group.messages[0].message_id} />
-                        )
-                    )
-                }
-                <div ref={containerRef} />
-            </div>
-            <Starboard />
+    return <div className='main-window'>
+        <div className='channels'>
+            {
+                favoriteRooms.map(room => (<button
+                    type="button"
+                    onClick={() => setCurrentRoom(room.id)}
+                    key={room.id}
+                >{room.name}</button>))
+            }
+            <input type='number' value={editingRoomNumber} onChange={(ev) => setEditingRoomNumber(ev.target.value)} />
+            <button onClick={addFavoriteRoom}>Add Favorite</button>
         </div>
-
-        <MessageComposer />
+        <ChatWindow chatRoomId={currentRoom} key={currentRoom} />
+        <Starboard roomId={currentRoom} />
     </div>
 }
 

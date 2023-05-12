@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { chatRoomId } from './util';
 
 type StarboardMessage = {
     times: number,
@@ -9,12 +8,12 @@ type StarboardMessage = {
     date: Date
 }
 
-const Starboard = ({ }) => {
+const Starboard = ({ roomId }: { roomId: number }) => {
     const [starData, setStarData] = useState<StarboardMessage[]>([]);
 
     useEffect(
         () => {
-            fetch(`https://chat.stackexchange.com/chats/stars/${chatRoomId}?count=0&_=${+new Date()}`
+            fetch(`https://chat.stackexchange.com/chats/stars/${roomId}?count=0&_=${+new Date()}`
             ).then(
                 res => {
                     if (!res.ok) {
@@ -32,12 +31,9 @@ const Starboard = ({ }) => {
 
                     const newStarData: StarboardMessage[] = [...starredMessages].map(
                         (message) => {
-                            console.log(message.outerHTML);
-
                             let times = message.querySelector('.times');
                             if (times !== null) {
                                 message.removeChild(times!.parentElement!);
-                                console.log(times);
                             }
 
                             const date = message.querySelector('.relativetime') as HTMLLinkElement | null;
@@ -69,7 +65,7 @@ const Starboard = ({ }) => {
                 }
             )
         },
-        []
+        [roomId]
     )
 
     return <div className='starboard'>
