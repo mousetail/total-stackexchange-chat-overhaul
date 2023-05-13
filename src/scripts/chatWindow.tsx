@@ -145,7 +145,7 @@ const ChatWindow = ({ chatRoomId }: { chatRoomId: number }) => {
             }
             <div ref={containerRef} />
         </div>
-        <MessageComposer />
+        <MessageComposer chatRoomId={chatRoomId} />
     </div>
 }
 

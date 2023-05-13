@@ -11,7 +11,7 @@
     grid-template-columns: 8rem 1fr;
     gap: 0.8rem 0.2rem;
     overflow-y: scroll;
-    height: calc(100vh - 10rem);
+    height: calc(100vh - 5rem);
 }
 
 .message {
@@ -66,8 +66,8 @@ body {
 
 textarea {
     resize: none;
-    height: 100%;
-    width: calc(100vw - 9rem);
+    height: 4rem;
+    width: 100%;
 
     box-shadow: #0002 1px 1px 4px 2px;
     border: none;
@@ -94,6 +94,63 @@ textarea {
 
     .channels {
         width: 15rem;
+
+        .channel-category {
+            width: 100%;
+            text-align: left;
+            margin: 0;
+            height: 3rem;
+
+            &~.channel-category {
+                margin-top: 0.5rem;
+            }
+
+            &:before {
+                margin-right: 1rem;
+                font-size: 1.2em;
+            }
+
+            &.expanded:before {
+                content: "▼"
+            }
+
+            &.collapsed:before {
+                content: "▶"
+            }
+
+            background-color: transparent;
+
+            &:hover {
+                background-color: #ddd;
+            }
+
+            >img {
+                width: 1.2rem;
+                height: 1.2rem;
+                vertical-align: middle;
+                margin: 0.25rem 0;
+            }
+        }
+
+        .channel {
+            width: calc(100% - 2rem);
+            margin: 0;
+            margin-left: 2rem;
+            text-align: left;
+            height: fit-content;
+
+            &:before {
+                content: '⎿';
+                margin-right: 0.7rem;
+                font-size: 1.2em;
+            }
+
+            background-color: transparent;
+
+            &:hover {
+                background-color: #ddd;
+            }
+        }
 
         button,
         input {

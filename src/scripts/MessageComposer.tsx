@@ -1,8 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useFkey } from './fkeyprovider';
-import { chatRoomId } from './util';
 
-const MessageComposer = () => {
+const MessageComposer = ({ chatRoomId }: { chatRoomId: number }) => {
     const fkey = useFkey();
     const [message, setMessage] = useState('');
 
