@@ -38,7 +38,7 @@ type SiteRooms = {
     rooms: RoomInfo[]
 }
 
-const SiteChannels = ({ site, onChangeChannel }: { site: SiteRooms, onChangeChannel: (id: number) => void }) => {
+const SiteChannels = ({ site, onChangeChannel, currentChannel }: { site: SiteRooms, onChangeChannel: (id: number) => void, currentChannel: number }) => {
     const [expanded, setExpanded] = useState(true);
 
     return <>
@@ -50,7 +50,7 @@ const SiteChannels = ({ site, onChangeChannel }: { site: SiteRooms, onChangeChan
             expanded && site.rooms.map((room) => (
                 <button
                     type="button"
-                    className='channel'
+                    className={'channel ' + (currentChannel === room.id ? 'active' : '')}
                     onClick={() => onChangeChannel(room.id)}
                     key={room.id}
                 >
@@ -127,7 +127,7 @@ const ChannelList = ({ onChangeChannel, channelId }: { onChangeChannel: (channel
         }
         {
             favoriteRooms.map(site => (
-                <SiteChannels site={site} onChangeChannel={onChangeChannel} key={site.siteName} />
+                <SiteChannels site={site} onChangeChannel={onChangeChannel} key={site.siteName} currentChannel={channelId} />
             )
             )
         }

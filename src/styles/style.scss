@@ -108,6 +108,9 @@ textarea {
             &:before {
                 margin-right: 1rem;
                 font-size: 1.2em;
+                display: inline-block;
+                width: 1.2rem;
+                color: grey;
             }
 
             &.expanded:before {
@@ -143,12 +146,18 @@ textarea {
                 content: '⎿';
                 margin-right: 0.7rem;
                 font-size: 1.2em;
+                color: grey;
             }
 
             background-color: transparent;
 
             &:hover {
                 background-color: #ddd;
+            }
+
+            &.active {
+                background-color: #eef;
+                color: #100;
             }
         }
 
